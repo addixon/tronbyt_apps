@@ -118,12 +118,15 @@ def render_summary(data):
         t = time.parse_time(timestamp)
         updated_at = "Upd: %02d:%02d" % (t.hour, t.minute)
 
-    # Wrap the Column in a Box to provide a defined layout area.
+    # Wrap the Column in a Box and set the Column to expand.
     return render.Box(
+        padding = 1,
         child = render.Column(
             main_align="space_around",
+            expanded = True, # This forces the column to fill the box
             children = [
                 render.Row(
+                    main_align="center",
                     children = [
                         render.Text("Reset: ", font="tom-thumb"),
                         render.Text(str(reset.get("success", 0)), color = "#00ff00", font="tom-thumb"),
@@ -134,6 +137,7 @@ def render_summary(data):
                     ],
                 ),
                 render.Row(
+                    main_align="center",
                     children = [
                         render.Text("Xfer:  ", font="tom-thumb"),
                         render.Text(str(xfer.get("success", 0)), color = "#00ff00", font="tom-thumb"),
