@@ -118,34 +118,33 @@ def render_summary(data):
         t = time.parse_time(timestamp)
         updated_at = "Upd: %02d:%02d" % (t.hour, t.minute)
 
-    # Use a Box with child_align="center" for robust vertical centering.
-    return render.Box(
-        child_align="center",
-        child = render.Column(
-            children = [
-                render.Row(
-                    main_align="center",
-                    children = [
-                        render.Text("Reset: ", font="tom-thumb"),
-                        render.Text(str(reset.get("success", 0)), color = "#00ff00", font="tom-thumb"),
-                        render.Text("/", font="tom-thumb"),
-                        render.Text(str(reset.get("fail", 0)), color = "#ff0000", font="tom-thumb"),
-                        render.Box(width=2), # Spacer
-                        render.Text(updated_at, font="tom-thumb"),
-                    ],
-                ),
-                # Add a manual spacer for vertical separation
-                render.Box(height = 4),
-                render.Row(
-                    main_align="center",
-                    children = [
-                        render.Text("Xfer:  ", font="tom-thumb"),
-                        render.Text(str(xfer.get("success", 0)), color = "#00ff00", font="tom-thumb"),
-                        render.Text("/", font="tom-thumb"),
-                        render.Text(str(xfer.get("fail", 0)), color = "#ff0000", font="tom-thumb"),
-                    ],
-                ),
-            ],
-        )
+    # Use a Column with flexible Box spacers to manually center the content.
+    # This is the most compatible layout method.
+    return render.Column(
+        children = [
+            render.Box(), # Flexible spacer
+            render.Row(
+                main_align="center",
+                children = [
+                    render.Text("Reset: ", font="tom-thumb"),
+                    render.Text(str(reset.get("success", 0)), color = "#00ff00", font="tom-thumb"),
+                    render.Text("/", font="tom-thumb"),
+                    render.Text(str(reset.get("fail", 0)), color = "#ff0000", font="tom-thumb"),
+                    render.Box(width=2), # Spacer
+                    render.Text(updated_at, font="tom-thumb"),
+                ],
+            ),
+            render.Box(height = 2), # Fixed spacer between rows
+            render.Row(
+                main_align="center",
+                children = [
+                    render.Text("Xfer:  ", font="tom-thumb"),
+                    render.Text(str(xfer.get("success", 0)), color = "#00ff00", font="tom-thumb"),
+                    render.Text("/", font="tom-thumb"),
+                    render.Text(str(xfer.get("fail", 0)), color = "#ff0000", font="tom-thumb"),
+                ],
+            ),
+            render.Box(), # Flexible spacer
+        ],
     )
 
