@@ -6,48 +6,24 @@ desc: Shows recent request statuses and a 24-hour summary of successful/failed r
 """
 
 load("render.star", "render")
-load("schema.star", "schema")
 load("http.star", "http")
 load("encoding/json.star", "json")
 load("time.star", "time")
 
-# Default URL for the companion worker repository.
-WORKER_INFO_URL = "https://github.com/your-username/your-repo"
-
-def get_schema():
-    """Gets the schema for the app config."""
-    return schema.Schema(
-        version = "1",
-        fields = [
-            schema.Text(
-                id = "worker_url",
-                name = "Worker URL",
-                desc = "The URL of your Cloudflare Worker.",
-                icon = "globe",
-            ),
-            schema.Password(
-                id = "auth_token",
-                name = "Auth Token",
-                desc = "The Bearer token for your worker.",
-            ),
-            schema.Text(
-                id = "info",
-                name = "Worker Info",
-                desc = "Click below for setup instructions.",
-                icon = "info",
-                default = WORKER_INFO_URL,
-            ),
-        ],
-    )
-
 def main(config):
     """App entrypoint."""
-    worker_url = config.get("worker_url")
-    auth_token = config.get("auth_token")
+    # --- CONFIGURATION WORKAROUND ---
+    # INSTRUCTIONS: Replace the placeholder values below with your
+    # actual Worker URL and Auth Token.
+    # WARNING: This is less secure as your token will be stored
+    # in plaintext in your apps repository.
+    worker_url = "https://your-worker-url.workers.dev"
+    auth_token = "your_secret_auth_token"
 
-    if not worker_url or not auth_token:
+    # Display a message if the default values haven't been changed.
+    if "your-worker-url" in worker_url or "your_secret_auth_token" in auth_token:
         return render.Root(
-            child = render.Text("Worker URL or Auth Token not set."),
+            child = render.Text("Configure app in .star file"),
         )
 
     # Fetch data from the Cloudflare Worker
@@ -132,3 +108,4 @@ def render_summary(summary):
             ],
         ),
     )
+
