@@ -118,11 +118,11 @@ def render_summary(data):
         t = time.parse_time(timestamp)
         updated_at = "Upd: %02d:%02d" % (t.hour, t.minute)
 
-    # Use a Column with flexible Box spacers to manually center the content.
+    # Use a Column with a fixed top spacer to manually position the content.
     # This is the most compatible layout method.
     return render.Column(
         children = [
-            render.Box(), # Flexible spacer
+            render.Box(height = 6), # Fixed top margin
             render.Row(
                 main_align="center",
                 children = [
@@ -134,7 +134,7 @@ def render_summary(data):
                     render.Text(updated_at, font="tom-thumb"),
                 ],
             ),
-            render.Box(height = 2), # Fixed spacer between rows
+            render.Box(height = 4), # Fixed spacer between rows
             render.Row(
                 main_align="center",
                 children = [
@@ -144,7 +144,6 @@ def render_summary(data):
                     render.Text(str(xfer.get("fail", 0)), color = "#ff0000", font="tom-thumb"),
                 ],
             ),
-            render.Box(), # Flexible spacer
         ],
     )
 
