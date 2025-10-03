@@ -50,52 +50,29 @@ def main(config):
     )
 
     if rep.status_code != 200:
-        return render.Root(
-            child = render.Column(
-                children=[
-                    render.Text("HTTP Error:"),
-                    render.Text(str(rep.status_code)),
-                ]
-            ),
-        )
+        return render.Error("HTTP Error %d" % rep.status_code)
 
     raw_body = rep.body()
     if not raw_body.startswith("{") or not raw_body.endswith("}"):
         return render.Root(child = render.Text("Invalid JSON"))
 
-    data = json.decode(raw_body)
     now = time.now()
     minute = now.minute
 
+    try:
+        data = json.decode(raw_body)
+    except err:
+        return render.Error("JSON decode failed: " + str(err))
+        
+    if not data.get("summary"):
+        return render.Error("Missing 'summary' in response")
+        
     # Determine which widget to display
     child_widget = render_summary(data)
 
     # Return the final, single Root object
     return render.Root(
         child = child_widget,
-    )
-
-def render_recent_requests(requests):
-    """Renders the scrolling marquee view."""
-    if not requests:
-        return render.Text("No requests in last 15m")
-
-    children = []
-    for req in requests:
-        req_type = "RST" if "reset" in req.get("resource_name", "") else "XFR"
-        status = req.get("status_code", "???")
-        color = "#ff0000" if int(str(status)) >= 400 else "#ffffff"
-        children.append(
-            render.Text("%s:%s" % (req_type, status), color = color),
-        )
-
-    return render.Marquee(
-        width = 64,
-        child = render.Row(
-            main_align = "space_around",
-            expanded = True,
-            children = children,
-        ),
     )
 
 def render_summary(data):
