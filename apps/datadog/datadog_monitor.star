@@ -3,6 +3,7 @@ app: Datadog Monitor
 author: Your Name
 summary: Displays Datadog trace stats
 desc: Shows recent request statuses and a 24-hour summary of successful/failed requests from a Datadog trace search. Requires a companion Cloudflare Worker.
+schema: get_schema
 """
 
 load("render.star", "render")
