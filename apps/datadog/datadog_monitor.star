@@ -25,7 +25,6 @@ def get_schema():
                 desc = "The URL of your Cloudflare Worker.",
                 icon = "globe",
             ),
-            # CORRECTED: Changed schema.Password to schema.Text for compatibility.
             schema.Text(
                 id = "auth_token",
                 name = "Auth Token",
@@ -48,11 +47,13 @@ def main(config):
     auth_token = config.get("auth_token")
 
     if not worker_url or not auth_token:
+        print("DATADOG APP ERROR: Worker URL or Auth Token not set in config.")
         return render.Root(
-            child = render.Text("Worker URL or Auth Token not set."),
+            child = render.Text("Missing Config"),
         )
 
     # Fetch data from the Cloudflare Worker
+    print("DATADOG APP: Fetching data from %s" % worker_url)
     rep = http.get(
         url = worker_url,
         headers = {
@@ -60,12 +61,30 @@ def main(config):
         },
     )
 
+    print("DATADOG APP: Received status code %d" % rep.status_code)
+
     if rep.status_code != 200:
+        print("DATADOG APP ERROR: Non-200 status code. Body: %s" % rep.body())
         return render.Root(
-            child = render.Text("Error: %s" % rep.body()),
+            child = render.Column(
+                children=[
+                    render.Text("HTTP Error:"),
+                    render.Text(str(rep.status_code)),
+                ]
+            ),
         )
 
-    data = json.decode(rep.body())
+    raw_body = rep.body()
+    print("DATADOG APP: Raw response body: %s" % raw_body)
+
+    # Starlark doesn't have try/except, so we check if the body is valid JSON-like
+    if not raw_body.startswith("{") or not raw_body.endswith("}"):
+        print("DATADOG APP ERROR: Response is not valid JSON.")
+        return render.Root(child = render.Text("Invalid JSON"))
+
+    data = json.decode(raw_body)
+    print("DATADOG APP: Decoded JSON data: %s" % data)
+
     now = time.now()
     minute = time.parse_time(now.to_string()).minute
 
@@ -86,7 +105,7 @@ def render_recent_requests(requests):
     for req in requests:
         req_type = "RST" if "reset" in req.get("resource_name", "") else "XFR"
         status = req.get("status_code", "???")
-        color = "#ff0000" if int(status) >= 400 else "#ffffff"
+        color = "#ff0000" if int(str(status)) >= 400 else "#ffffff" # Added str() for safety
         children.append(
             render.Text("%s:%s" % (req_type, status), color = color),
         )
