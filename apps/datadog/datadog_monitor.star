@@ -59,6 +59,43 @@ def main(config):
             ),
         )
 
+    # --- DIAGNOSTIC MODE ---
+    # This will display the raw text received from the worker.
+    # It helps us see the exact data structure.
+    return render.Root(
+        child = render.Marquee(
+            width=64,
+            child=render.Text(rep.body()),
+        ),
+    )
+
+# The original rendering functions are kept below for when we switch back.
+def original_main(config):
+    worker_url = config.get("worker_url")
+    auth_token = config.get("auth_token")
+
+    if not worker_url or not auth_token:
+        return render.Root(
+            child = render.Text("Missing Config"),
+        )
+
+    rep = http.get(
+        url = worker_url,
+        headers = {
+            "Authorization": "Bearer " + auth_token,
+        },
+    )
+
+    if rep.status_code != 200:
+        return render.Root(
+            child = render.Column(
+                children=[
+                    render.Text("HTTP Error:"),
+                    render.Text(str(rep.status_code)),
+                ]
+            ),
+        )
+
     raw_body = rep.body()
     if not raw_body.startswith("{") or not raw_body.endswith("}"):
         return render.Root(child = render.Text("Invalid JSON"))
@@ -67,13 +104,11 @@ def main(config):
     now = time.now()
     minute = now.minute
 
-    # Determine which widget to display
     if minute < 2:
         child_widget = render_recent_requests(data.get("recent_requests", []))
     else:
         child_widget = render_summary(data)
 
-    # Return the final, single Root object
     return render.Root(
         child = child_widget,
     )
