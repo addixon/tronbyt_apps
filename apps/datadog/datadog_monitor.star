@@ -67,16 +67,44 @@ def main(config):
     now = time.now()
     minute = now.minute
 
-    # Determine which widget to display
-    if minute < 2:
-        child_widget = render_recent_requests(data.get("recent_requests", []))
-    else:
-        child_widget = render_summary(data)
+    # For now, we will always show the summary view for diagnostics
+    child_widget = render_summary(data)
 
     # Return the final, single Root object
     return render.Root(
         child = child_widget,
     )
+
+def render_summary(data):
+    """DIAGNOSTIC: Renders a step-by-step check of the data."""
+    
+    # Step 1: Check if the 'summary' key exists
+    summary = data.get("summary")
+    if not summary:
+        return render.Text("Debug: No 'summary' key in JSON.")
+
+    # Step 2: Check if the 'reset' key exists within summary
+    reset = summary.get("reset")
+    if not reset:
+        return render.Text("Debug: No 'reset' key in summary.")
+
+    # Step 3: Check if the 'success' key exists within reset
+    success_count = reset.get("success")
+    if success_count == None: # Must check for None, as 0 is a valid value
+        return render.Text("Debug: No 'success' key in reset.")
+
+    # If all checks pass, the data structure is correct.
+    # The original rendering code can be restored.
+    return render.Column(
+        children = [
+            render.Text("Debug OK!"),
+            render.Text("Success: " + str(success_count)),
+            render.Text("Type: " + str(type(success_count))),
+        ],
+    )
+
+
+# --- Original Rendering Functions (for reference) ---
 
 def render_recent_requests(requests):
     """Renders the scrolling marquee view."""
@@ -101,7 +129,7 @@ def render_recent_requests(requests):
         ),
     )
 
-def render_summary(data):
+def original_render_summary(data):
     """Renders the 24-hour summary view."""
     summary = data.get("summary")
     timestamp = data.get("timestamp")
@@ -112,7 +140,6 @@ def render_summary(data):
     reset = summary.get("reset", {})
     xfer = summary.get("transfer", {})
 
-    # Format the timestamp for display
     updated_at = ""
     if timestamp:
         t = time.parse_time(timestamp)
@@ -126,7 +153,7 @@ def render_summary(data):
                     render.Text(str(reset.get("success", 0)), color = "#00ff00"),
                     render.Text("/"),
                     render.Text(str(reset.get("fail", 0)), color = "#ff0000"),
-                    render.Box(width=2), # Spacer
+                    render.Box(width=2),
                     render.Text(updated_at, font="tom-thumb"),
                 ],
             ),
