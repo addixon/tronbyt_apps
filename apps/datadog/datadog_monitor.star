@@ -60,10 +60,10 @@ def main(config):
     now = time.now()
     minute = now.minute
 
-    try:
+    if raw_body.startswith("{") and raw_body.endswith("}"):
         data = json.decode(raw_body)
-    except err:
-        return render.Error("JSON decode failed: " + str(err))
+    else:
+        return render.Error("Invalid JSON format")
         
     if not data.get("summary"):
         return render.Error("Missing 'summary' in response")
@@ -103,7 +103,7 @@ def render_summary(data):
             children = [
                 render.Row(
                     expanded = True,
-                    main_align="left",
+                    main_align = "left",
                     children = [
                         render.Text("Reset:  ", font="tom-thumb"),
                         render.Text(str(reset.get("success", 0)), color = "#06402b", font="tom-thumb"),
@@ -115,7 +115,7 @@ def render_summary(data):
                 ),
                 render.Row(
                     expanded = True,
-                    main_align="left",
+                    main_align = "left",
                     children = [
                         render.Text("Transfer:  ", font="tom-thumb"),
                         render.Text(str(transfer.get("success", 0)), color = "#06402b", font="tom-thumb"),
