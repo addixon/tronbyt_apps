@@ -76,8 +76,31 @@ def main(config):
         child = child_widget,
     )
 
+
+
+def status_row(label, success, fourHundred, fiveHundred):
+    return render.Row(
+        main_align = "start",
+        children = [
+            render.Box(width = 30, height = 11, child = render.Text(label, font = "tom-thumb")),
+            render.Box(width = 12, height = 11, child = render.Text(str(success), font = "tom-thumb", color = "#06402b")),
+            render.Box(width = 12, height = 11, child = render.Text(str(fourHundred), font = "tom-thumb", color = "#ffee8c")),
+            render.Box(width = 12, height = 11, child = render.Text(str(fiveHundred), font = "tom-thumb", color = "#8b0000")),
+        ]
+    )
+    
+def updatedat_row(updated_at):
+    return render.Row(
+        main_align = "start",
+        children = [
+            render.Box(
+                height = 11,
+                child = render.Text(updated_at, font = "tom-thumb")
+            )
+        ]
+    )
+
 def render_summary(data):
-    """Renders the 24-hour summary view."""
     summary = data.get("summary")
     timestamp = data.get("timestamp")
 
@@ -87,45 +110,19 @@ def render_summary(data):
     reset = summary.get("reset", {})
     transfer = summary.get("transfer", {})
 
-    # Format the timestamp for display
     updated_at = ""
     if timestamp:
         t = time.parse_time(timestamp)
-        updated_at = "Upd: %02d:%02d" % (t.hour, t.minute)
+        if t:
+            updated_at = "%02d:%02d" % (t.hour, t.minute)
+        else:
+            updated_at = "Unknown"
 
-    # Use a Column with a fixed top spacer to manually position the content.
-    # This is the most compatible layout method.
-    return render.Stack(
-        render.Column(
-            main_align = "space_evenly",  # this controls position of children, start = top
-            expanded = True,
-            cross_align = "center",
-            children = [
-                render.Row(
-                    expanded = True,
-                    main_align = "left",
-                    children = [
-                        render.Text("Reset:  ", font="tom-thumb"),
-                        render.Text(str(reset.get("success", 0)), color = "#06402b", font="tom-thumb"),
-                        render.Text("/", font="tom-thumb"),
-                        render.Text(str(reset.get("fourHundred", 0)), color = "#ffee8c", font="tom-thumb"),
-                        render.Text("/", font="tom-thumb"),
-                        render.Text(str(reset.get("fiveHundred", 0)), color = "#8b0000", font="tom-thumb"),
-                    ],
-                ),
-                render.Row(
-                    expanded = True,
-                    main_align = "left",
-                    children = [
-                        render.Text("Transfer:  ", font="tom-thumb"),
-                        render.Text(str(transfer.get("success", 0)), color = "#06402b", font="tom-thumb"),
-                        render.Text("/", font="tom-thumb"),
-                        render.Text(str(transfer.get("fourHundred", 0)), color = "#ffee8c", font="tom-thumb"),
-                        render.Text("/", font="tom-thumb"),
-                        render.Text(str(transfer.get("fiveHundred", 0)), color = "#8b0000", font="tom-thumb"),
-                    ],
-                ),
-            ],
-        )
+    return render.Column(
+        cross_align = "start",
+        children = [
+            status_row("Reset:", reset.get("success", 0), reset.get("fourHundred", 0), reset.get("fiveHundred", 0)),
+            status_row("X-fer:", transfer.get("success", 0), transfer.get("fourHundred", 0), transfer.get("fiveHundred", 0)),
+            updatedat_row(updated_at),
+        ]
     )
-
