@@ -68,10 +68,7 @@ def main(config):
     minute = now.minute
 
     # Determine which widget to display
-    if minute < 2:
-        child_widget = render_recent_requests(data.get("recent_requests", []))
-    else:
-        child_widget = render_summary(data)
+    child_widget = render_summary(data)
 
     # Return the final, single Root object
     return render.Root(
@@ -110,7 +107,7 @@ def render_summary(data):
         return render.Text("Summary data not available.")
 
     reset = summary.get("reset", {})
-    xfer = summary.get("transfer", {})
+    transfer = summary.get("transfer", {})
 
     # Format the timestamp for display
     updated_at = ""
@@ -120,30 +117,37 @@ def render_summary(data):
 
     # Use a Column with a fixed top spacer to manually position the content.
     # This is the most compatible layout method.
-    return render.Column(
-        children = [
-            render.Box(height = 6), # Fixed top margin
-            render.Row(
-                main_align="center",
-                children = [
-                    render.Text("Reset: ", font="tom-thumb"),
-                    render.Text(str(reset.get("success", 0)), color = "#00ff00", font="tom-thumb"),
-                    render.Text("/", font="tom-thumb"),
-                    render.Text(str(reset.get("fail", 0)), color = "#ff0000", font="tom-thumb"),
-                    render.Box(width=2), # Spacer
-                    render.Text(updated_at, font="tom-thumb"),
-                ],
-            ),
-            render.Box(height = 4), # Fixed spacer between rows
-            render.Row(
-                main_align="center",
-                children = [
-                    render.Text("Xfer:  ", font="tom-thumb"),
-                    render.Text(str(xfer.get("success", 0)), color = "#00ff00", font="tom-thumb"),
-                    render.Text("/", font="tom-thumb"),
-                    render.Text(str(xfer.get("fail", 0)), color = "#ff0000", font="tom-thumb"),
-                ],
-            ),
-        ],
+    return render.Stack(
+        render.Column(
+            main_align = "space_evenly",  # this controls position of children, start = top
+            expanded = True,
+            cross_align = "center",
+            children = [
+                render.Row(
+                    expanded = True,
+                    main_align="left",
+                    children = [
+                        render.Text("Reset:  ", font="tom-thumb"),
+                        render.Text(str(reset.get("success", 0)), color = "#06402b", font="tom-thumb"),
+                        render.Text("/", font="tom-thumb"),
+                        render.Text(str(reset.get("fourHundred", 0)), color = "#ffee8c", font="tom-thumb"),
+                        render.Text("/", font="tom-thumb"),
+                        render.Text(str(reset.get("fiveHundred", 0)), color = "#8b0000", font="tom-thumb"),
+                    ],
+                ),
+                render.Row(
+                    expanded = True,
+                    main_align="left",
+                    children = [
+                        render.Text("Transfer:  ", font="tom-thumb"),
+                        render.Text(str(transfer.get("success", 0)), color = "#06402b", font="tom-thumb"),
+                        render.Text("/", font="tom-thumb"),
+                        render.Text(str(transfer.get("fourHundred", 0)), color = "#ffee8c", font="tom-thumb"),
+                        render.Text("/", font="tom-thumb"),
+                        render.Text(str(transfer.get("fiveHundred", 0)), color = "#8b0000", font="tom-thumb"),
+                    ],
+                ),
+            ],
+        )
     )
 

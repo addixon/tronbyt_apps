@@ -1,9 +1,0 @@
----
-id: windytron
-name: Windytron
-summary: Show Windytron Stations
-desc: 'Display windytron Stations'
-author: tavdog
-fileName: windytron.star
-packageName: windytron
-recommended_interval: 1

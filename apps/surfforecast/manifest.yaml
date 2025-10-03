@@ -1,9 +1,0 @@
----
-id: surf-forecast
-name: Surf Forecast
-summary: Daily surf forecast
-desc: Daily surf forecast for any spot on Surfline.
-author: smith-kyle
-fileName: surf_forecast.star
-packageName: surfforecast
-recommended_interval: 5
