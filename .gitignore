@@ -33,3 +33,5 @@ BUILD.bazel
 .vscode
 node_modules/
 
+*.dev
+
