@@ -6,10 +6,10 @@ desc: Shows recent request statuses and a 24-hour summary of successful/failed r
 schema: get_schema
 """
 
+load("encoding/json.star", "json")
+load("http.star", "http")
 load("render.star", "render")
 load("schema.star", "schema")
-load("http.star", "http")
-load("encoding/json.star", "json")
 load("time.star", "time")
 
 def get_schema():
@@ -57,17 +57,14 @@ def main(config):
     if not raw_body.startswith("{") or not raw_body.endswith("}"):
         return render.Root(child = render.Text("Invalid JSON"))
 
-    now = time.now()
-    minute = now.minute
-
     if raw_body.startswith("{") and raw_body.endswith("}"):
         data = json.decode(raw_body)
     else:
         return render.Error("Invalid JSON format")
-        
+
     if not data.get("summary"):
         return render.Error("Missing 'summary' in response")
-        
+
     # Determine which widget to display
     child_widget = render_summary(data)
 
@@ -75,8 +72,6 @@ def main(config):
     return render.Root(
         child = child_widget,
     )
-
-
 
 def status_row(label, success, fourHundred, fiveHundred):
     return render.Row(
@@ -86,18 +81,18 @@ def status_row(label, success, fourHundred, fiveHundred):
             render.Box(width = 12, height = 11, child = render.Text(str(success), font = "tom-thumb", color = "#06402b")),
             render.Box(width = 12, height = 11, child = render.Text(str(fourHundred), font = "tom-thumb", color = "#ffee8c")),
             render.Box(width = 12, height = 11, child = render.Text(str(fiveHundred), font = "tom-thumb", color = "#8b0000")),
-        ]
+        ],
     )
-    
+
 def updatedat_row(updated_at):
     return render.Row(
         main_align = "start",
         children = [
             render.Box(
                 height = 11,
-                child = render.Text(updated_at, font = "tom-thumb")
-            )
-        ]
+                child = render.Text(updated_at, font = "tom-thumb"),
+            ),
+        ],
     )
 
 def render_summary(data):
@@ -114,7 +109,7 @@ def render_summary(data):
     if timestamp:
         t = time.parse_time(timestamp)
         if t:
-            updated_at = "%02d:%02d" % (t.hour, t.minute)
+            updated_at = "%d:%d" % (t.hour, t.minute)
         else:
             updated_at = "Unknown"
 
@@ -124,5 +119,5 @@ def render_summary(data):
             status_row("Reset:", reset.get("success", 0), reset.get("fourHundred", 0), reset.get("fiveHundred", 0)),
             status_row("X-fer:", transfer.get("success", 0), transfer.get("fourHundred", 0), transfer.get("fiveHundred", 0)),
             updatedat_row(updated_at),
-        ]
+        ],
     )
