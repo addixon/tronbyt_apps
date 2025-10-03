@@ -118,27 +118,30 @@ def render_summary(data):
         t = time.parse_time(timestamp)
         updated_at = "Upd: %02d:%02d" % (t.hour, t.minute)
 
-    return render.Column(
-        main_align="space_around", # Add alignment to spread the rows out
-        children = [
-            render.Row(
-                children = [
-                    render.Text("Reset: ", font="tom-thumb"),
-                    render.Text(str(reset.get("success", 0)), color = "#00ff00", font="tom-thumb"),
-                    render.Text("/", font="tom-thumb"),
-                    render.Text(str(reset.get("fail", 0)), color = "#ff0000", font="tom-thumb"),
-                    render.Box(width=2), # Spacer
-                    render.Text(updated_at, font="tom-thumb"),
-                ],
-            ),
-            render.Row(
-                children = [
-                    render.Text("Xfer:  ", font="tom-thumb"),
-                    render.Text(str(xfer.get("success", 0)), color = "#00ff00", font="tom-thumb"),
-                    render.Text("/", font="tom-thumb"),
-                    render.Text(str(xfer.get("fail", 0)), color = "#ff0000", font="tom-thumb"),
-                ],
-            ),
-        ],
+    # Wrap the Column in a Box to provide a defined layout area.
+    return render.Box(
+        child = render.Column(
+            main_align="space_around",
+            children = [
+                render.Row(
+                    children = [
+                        render.Text("Reset: ", font="tom-thumb"),
+                        render.Text(str(reset.get("success", 0)), color = "#00ff00", font="tom-thumb"),
+                        render.Text("/", font="tom-thumb"),
+                        render.Text(str(reset.get("fail", 0)), color = "#ff0000", font="tom-thumb"),
+                        render.Box(width=2), # Spacer
+                        render.Text(updated_at, font="tom-thumb"),
+                    ],
+                ),
+                render.Row(
+                    children = [
+                        render.Text("Xfer:  ", font="tom-thumb"),
+                        render.Text(str(xfer.get("success", 0)), color = "#00ff00", font="tom-thumb"),
+                        render.Text("/", font="tom-thumb"),
+                        render.Text(str(xfer.get("fail", 0)), color = "#ff0000", font="tom-thumb"),
+                    ],
+                ),
+            ],
+        )
     )
 
