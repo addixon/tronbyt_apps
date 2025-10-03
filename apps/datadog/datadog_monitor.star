@@ -95,6 +95,9 @@ def updatedat_row(updated_at):
         ],
     )
 
+def pad(n):
+    return "0" + str(n) if n < 10 else str(n)
+
 def render_summary(data):
     summary = data.get("summary")
     timestamp = data.get("timestamp")
@@ -109,7 +112,7 @@ def render_summary(data):
     if timestamp:
         t = time.parse_time(timestamp)
         if t:
-            updated_at = "%d:%d" % (t.hour, t.minute)
+            updated_at = "%s:%s" % (pad(t.hour), pad(t.minute))
         else:
             updated_at = "Unknown"
 
