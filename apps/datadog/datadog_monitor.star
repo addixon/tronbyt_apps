@@ -25,10 +25,12 @@ def get_schema():
                 desc = "The URL of your Cloudflare Worker.",
                 icon = "globe",
             ),
-            schema.Password(
+            # CORRECTED: Changed schema.Password to schema.Text for compatibility.
+            schema.Text(
                 id = "auth_token",
                 name = "Auth Token",
                 desc = "The Bearer token for your worker.",
+                icon = "key",
             ),
             schema.Text(
                 id = "info",
