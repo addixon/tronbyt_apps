@@ -118,12 +118,10 @@ def render_summary(data):
         t = time.parse_time(timestamp)
         updated_at = "Upd: %02d:%02d" % (t.hour, t.minute)
 
-    # Wrap the Column in a Box and set the Column to expand.
+    # Use a Box with child_align="center" for robust vertical centering.
     return render.Box(
-        padding = 1,
+        child_align="center",
         child = render.Column(
-            main_align="space_around",
-            expanded = True, # This forces the column to fill the box
             children = [
                 render.Row(
                     main_align="center",
@@ -136,6 +134,8 @@ def render_summary(data):
                         render.Text(updated_at, font="tom-thumb"),
                     ],
                 ),
+                # Add a manual spacer for vertical separation
+                render.Box(height = 4),
                 render.Row(
                     main_align="center",
                     children = [
