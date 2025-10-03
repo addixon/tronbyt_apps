@@ -75,7 +75,8 @@ def main(config):
 
     data = json.decode(raw_body)
     now = time.now()
-    minute = time.parse_time(now.to_string()).minute
+    # CORRECTED: Get the minute directly from the time object.
+    minute = now.minute
 
     # Determine which widget to display
     if minute < 2:
